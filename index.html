@@ -1,71 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pin Generator</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pin Generator</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous" />
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="pin-generator half-width">
-                    <input id="show-pin" class="form-control" type="text">
-                    <button id="generate" class="generate-btn">Generate Pin</button>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="input-section half-width">
-                    <input class="form-control" type="text">
-                    <div class="numbers">
-                        <div class="calc-body">
-                            <div class="calc-button-row">
-                              <div class="button">7</div>
-                              <div class="button">8</div>
-                              <div class="button">9</div>
-                            </div>
-                            <div class="calc-button-row">
-                              <div class="button">4</div>
-                              <div class="button">5</div>
-                              <div class="button">6</div>
-                            </div>
-                            <div class="calc-button-row">
-                              <div class="button">1</div>
-                              <div class="button">2</div>
-                              <div class="button">3</div>
-                            </div>
-                            <div class="calc-button-row">
-                                <div class="button"><</div>
-                                <div class="button">0</div>
-                                <div class="button">C</div>
-                            </div>
-                            <div>
-                                <button type="submit" class="submit-btn">Submit</button>
-                                <p class="action-left">3 try left</p>
-                            </div>
-                    </div>
-                </div>
-            </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="pin-generator half-width">
+          <input id="generated-pin-viewer" class="form-control" type="text" readonly="readonly"
+            placeholder="Click Generate Pin Button" />
+          <button onclick="generatePin()" id="btn-generate-pin" class="generate-btn">Generate PIN</button>
         </div>
-        <div id="last-section" class="notify-section">
-            <p class="notify">❌ Pin Didn't Match, Please try again</p>
-            <p class="notify">✅ Pin Matched... Secret door is opening for you</p>
+      </div>
+      <div class="col-md-6">
+        <div class="input-section half-width">
+          <input id="input-pin-viewer" class="form-control" type="text" readonly="readonly"
+            placeholder="Input Your Pin to Match" />
+          <div class="numbers">
+            <div class="calc-body noselect">
+              <div class="calc-button-row ">
+                <div class="button number" id="7">7</div>
+                <div class="button number" id="8">8</div>
+                <div class="button number" id="9">9</div>
+              </div>
+              <div class="calc-button-row ">
+                <div class="button number" id="4">4</div>
+                <div class="button number" id="5">5</div>
+                <div class="button number" id="6">6</div>
+              </div>
+              <div class="calc-button-row ">
+                <div class="button number" id="1">1</div>
+                <div class="button number" id="2">2</div>
+                <div class="button number" id="3">3</div>
+              </div>
+              <div class="calc-button-row ">
+                <div onclick="btnBackspace()" class="button">&lt;</div>
+                <div class="button number" id="0">0</div>
+                <div onclick="btnClear()" class="button">C</div>
+              </div>
+              <div>
+                <button onclick="submitPinBtn()" type="submit" class="submit-btn" id="btnSubmit">Submit</button>
+                <p class="action-left"><span id="left-count">3</span> try left</p>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+      <div class="notify-section">
+
+        <p id="empty-info" class="notify">ℹ️ Please Generate PIN First</p>
+        <p id="error-info" class="notify">❌ Pin Didn't Match, Please try again</p>
+        <p id="timeleft-info" class="notify">❌ You have 0 try left, Reload the page and try again</p>
+        <p id="success-info" class="notify">✅ Pin Matched... Secret door is opening for you</p>
+      </div>
     </div>
-
     <script>
+        // Hide All Notification And Disable Submit Button Function Call
+disableSubmitBtn();
+allNotification("error", "none");
+allNotification("success", "none");
+allNotification("empty", "block");
+allNotification("timeleft", "none");
+
+// PIN Generate Function
+function generatePin() {
+  let pin = Math.floor(999 + Math.random() * 9000);
+  document.getElementById("generated-pin-viewer").value = pin;
+  allNotification("empty", "none");
+}
+
+// Disable Submit Button Function
+function disableSubmitBtn() {
+  let inputPin = document.getElementById("input-pin-viewer").value;
+  if (inputPin == "") {
+    document.getElementById("btnSubmit").disabled = true;
+  }
+}
+
+// Backspace Button Function
+function btnBackspace() {
+  allNotification("error", "none");
+  allNotification("success", "none");
+  document.getElementById("btnSubmit").disabled = true;
+  let inputPin = document.getElementById("input-pin-viewer").value;
+  inputPin = inputPin.substr(0, inputPin.length - 1);
+  printOut(inputPin);
+}
+
+// Clear Button Function
+function btnClear() {
+  allNotification("error", "none");
+  allNotification("success", "none");
+  document.getElementById("btnSubmit").disabled = true;
+  document.getElementById("input-pin-viewer").value = "";
+}
+
+// Given PIN Output Function
+function printOut(num) {
+  document.getElementById("input-pin-viewer").value = num;
+}
+
+// All Number Click EventListener Function
+let btnNumber = document.getElementsByClassName("number");
+for (let i = 0; i < btnNumber.length; i++) {
+  btnNumber[i].addEventListener("click", function () {
+    let inputPin = document.getElementById("input-pin-viewer").value;
+    let leftCount = document.getElementById("left-count").innerText;
+    if (inputPin.length == 3 && leftCount != 0) {
+      document.getElementById("btnSubmit").disabled = false;
+      document.getElementById("btn-generate-pin").disabled = false;
+    }
+    if (inputPin.length < 4) {
+      inputPin = inputPin + this.id;
+      printOut(inputPin);
+    }
+  });
+}
+
+// Submit Button Function
+function submitPinBtn() {
+  let generatedPin = document.getElementById("generated-pin-viewer").value;
+  let inputPin = document.getElementById("input-pin-viewer").value;
+  if (generatedPin == "") {
+    allNotification("empty", "block");
+  } else {
+    if (generatedPin == inputPin) {
+      allNotification("success", "block");
+    } else {
+      allNotification("error", "block");
+      // Error Count Function
+      let leftCount = parseInt(document.getElementById("left-count").innerText);
+      leftCount = leftCount - 1;
+      document.getElementById("left-count").innerText = leftCount;
+      if (leftCount == 0) {
+        for (var i = 0; i < document.getElementsByClassName("button").length; i++) {
+          document.getElementsByClassName("button")[i].onclick = false;
+        }
+        document.getElementById("btnSubmit").disabled = true;
+        document.getElementById("btn-generate-pin").disabled = true;
+        allNotification("timeleft", "block");
+        allNotification("error", "none");
+      }
+    }
+  }
+}
+
+// Time Left Notification Function
+function timeLeft() {
+  if (document.getElementById("left-count").innerText == 0) {
+    allNotification("timeleft", "block");
+  }
+}
+function allNotification(id, value) {
+  document.getElementById(id + "-info").style.display = value;
+}
 
 
-              document.getElementById('generate').addEventListener('click', function(){
-                  const generateBtn = document.getElementById('show-pin');
-                  const showPin = parseInt(generateBtn.value);
-                  const randomNumber = Math.floor(Math.random()*10000 + 1);
-                  const showNumber =  randomNumber;
-                  generateBtn.value = showNumber;
-                    
-              })
+
     </script>
 </body>
+
 </html>
